@@ -1,0 +1,894 @@
+import React, { useState, useMemo } from ‘react’;
+
+// CDW logo (compressed webp, base64-embedded)
+const CDW_LOGO = “data:image/webp;base64,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”;
+
+// === PLAN DATA — Source: CDW Loan Programs PDF, effective 03/01/2025 ===
+// Plans marked legacy: true are NOT in the current PDF but kept available behind a toggle.
+// Plans marked revolving: true are Synchrony Financial Revolving Credit Program.
+
+// — WELLS FARGO HOME PROJECTS CREDIT PROGRAM (PDF current) —
+const WELLS = [
+// 0% Equal Monthly Payment plans
+{ lender: ‘wells’, id: ‘4079’, family: ‘equal’, desc: ‘24 Equal Monthly Pmts 0% APR’, term: 24, apr: 0, rate: 12.99 },
+{ lender: ‘wells’, id: ‘4091’, family: ‘equal’, desc: ‘36 Equal Monthly Pmts 0% APR’, term: 36, apr: 0, rate: 15.99 },
+{ lender: ‘wells’, id: ‘4103’, family: ‘equal’, desc: ‘48 Equal Monthly Pmts 0% APR’, term: 48, apr: 0, rate: 17.99 },
+{ lender: ‘wells’, id: ‘4115’, family: ‘equal’, desc: ‘60 Equal Monthly Pmts 0% APR’, term: 60, apr: 0, rate: 19.99 },
+{ lender: ‘wells’, id: ‘4062’, family: ‘equal’, desc: ‘72 Equal Monthly Pmts 0% APR’, term: 72, apr: 0, rate: 21.99 },
+// Deferred-interest plans (promo within longer term)
+{ lender: ‘wells’, id: ‘1019’, family: ‘deferred’, desc: ‘12 Months 0% APR with regular pmts’, promoTerm: 12, term: 60, factor: 3.50, rate: 7.24, apr: 0, postApr: 26.99 },
+{ lender: ‘wells’, id: ‘1066’, family: ‘deferred’, desc: ‘18 Months 0% APR with regular pmts’, promoTerm: 18, term: 60, factor: 3.50, rate: 8.24, apr: 0, postApr: 26.99 },
+// Reduced APR
+{ lender: ‘wells’, id: ‘2701’, family: ‘reduced’, desc: ‘Special Rate of 5.9%’, factor: 1.75, rate: 9.74, apr: 5.90, term: 60 },
+{ lender: ‘wells’, id: ‘3702’, family: ‘reduced’, desc: ‘Special Rate of 7.9%’, factor: 1.75, rate: 8.74, apr: 7.90, term: 60, badge: ‘CURRENT’ },
+{ lender: ‘wells’, id: ‘1193’, family: ‘reduced’, desc: ‘Special Rate of 9.9%’, factor: 2.00, rate: 6.74, apr: 9.90, term: 60 },
+];
+
+// — GREENSKY CREDIT PROGRAM (PDF current) —
+const GREENSKY = [
+{ lender: ‘greensky’, id: ‘2716’, family: ‘reduced’,  desc: ‘Special rate 6.99%’,                    factor: 1.98, rate: 8.75,  apr: 6.99,  term: 60 },
+{ lender: ‘greensky’, id: ‘2611’, family: ‘deferred’, desc: ‘12 Months 0% APR with regular pmts’,    promoTerm: 12, term: 36, factor: 3.32, rate: 6.20,  apr: 0, postApr: 24.99 },
+{ lender: ‘greensky’, id: ‘2631’, family: ‘deferred’, desc: ‘18 Months 0% APR with regular pmts’,    promoTerm: 18, term: 84, factor: 1.76, rate: 7.20,  apr: 0, postApr: 24.99 },
+{ lender: ‘greensky’, id: ‘2641’, family: ‘deferred’, desc: ‘24 Months 0% APR with regular pmts’,    promoTerm: 24, term: 84, factor: 2.10, rate: 15.25, apr: 0, postApr: 24.99 },
+{ lender: ‘greensky’, id: ‘2531’, family: ‘deferred’, desc: ‘18 Months 0% APR, No Payment’,          promoTerm: 18, term: 84, factor: 1.98, rate: 14.75, apr: 0, postApr: 24.99, noPayment: true },
+{ lender: ‘greensky’, id: ‘6124’, family: ‘equal’,    desc: ‘24 Equal Monthly Pmts 0% APR’,          term: 24, factor: 2.25, rate: 12.00, apr: 0 },
+{ lender: ‘greensky’, id: ‘6136’, family: ‘equal’,    desc: ‘36 Equal Monthly Pmts 0% APR’,          term: 36, factor: 2.78, rate: 17.75, apr: 0 },
+{ lender: ‘greensky’, id: ‘6148’, family: ‘equal’,    desc: ‘48 Equal Monthly Pmts 0% APR’,          term: 48, factor: 2.08, rate: 20.50, apr: 0 },
+{ lender: ‘greensky’, id: ‘6160’, family: ‘equal’,    desc: ‘60 Equal Monthly Pmts 0% APR’,          term: 60, factor: 1.67, rate: 22.75, apr: 0 },
+];
+
+// — SYNCHRONY (combined Credit + Revolving — PDF current) —
+const SYNCHRONY = [
+// Synchrony Credit Program (installment-style)
+{ lender: ‘synchrony’, id: ‘AC6’,   family: ‘equal’,       desc: ‘6 Month with pmts interest promo’,                  term: 6,   factor: 100/6,   rate: 5.25,  apr: 0 },
+{ lender: ‘synchrony’, id: ‘AC18’,  family: ‘equal’,       desc: ‘18 Month with pmts interest promo’,                 term: 18,  factor: 100/18,  rate: 11.75, apr: 0 },
+{ lender: ‘synchrony’, id: ‘AC24’,  family: ‘equal’,       desc: ‘24 Month with pmts interest promo’,                 term: 24,  factor: 100/24,  rate: 15.25, apr: 0 },
+{ lender: ‘synchrony’, id: ‘AC12’,  family: ‘deferred’,    desc: ‘12 Month Interest Promo / 84 month term’,           promoTerm: 12, term: 84, factor: null, rate: 8.25, apr: 26.99, postApr: 26.99 },
+{ lender: ‘synchrony’, id: ‘AC84’,  family: ‘installment’, desc: ‘84 Month Installment Loan (Min ,000)’,            term: 84,  factor: 1.712,   rate: 7.00,  apr: 10.99, minAmount: 3000 },
+{ lender: ‘synchrony’, id: ‘AC120’, family: ‘installment’, desc: ‘120 Month Installment Loan (Min ,500)’,           term: 120, factor: 1.377,   rate: 8.25,  apr: 10.99, minAmount: 4500 },
+{ lender: ‘synchrony’, id: ‘AC144’, family: ‘installment’, desc: ‘144 Month Installment Loan (Min ,000)’,          term: 144, factor: 1.253,   rate: 10.25, apr: 10.99, minAmount: 10000 },
+
+// Synchrony Financial Revolving Credit Program
+{ lender: ‘synchrony’, id: ‘924/605’, family: ‘deferred’, desc: ‘18 Months 0% APR with regular pmts (Revolving)’, promoTerm: 18, term: null, factor: 2.50, rate: 10.00, apr: 0, postApr: 26.99, revolving: true, badge: ‘POPULAR’ },
+{ lender: ‘synchrony’, id: ‘930’,     family: ‘equal’,    desc: ‘25 Months 0% APR with Equal pmts (Revolving)’,   term: 25, factor: 4.00, rate: 11.25, apr: 0, revolving: true },
+];
+
+// — LEGACY PLANS (not in current PDF, available via toggle) —
+const LEGACY = [
+// Legacy Synchrony deferred (originally pre-PDF)
+{ lender: ‘synchrony’, id: ‘920’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 6 Months’,  promoTerm: 6,  term: 6,  factor: 2.50, rate: 5.60,  apr: 0, postApr: 26.99, legacy: true },
+{ lender: ‘synchrony’, id: ‘921’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 9 Months’,  promoTerm: 9,  term: 9,  factor: 2.50, rate: 7.60,  apr: 0, postApr: 26.99, legacy: true },
+{ lender: ‘synchrony’, id: ‘922’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 12 Months’, promoTerm: 12, term: 12, factor: 2.50, rate: 8.35,  apr: 0, postApr: 26.99, legacy: true },
+{ lender: ‘synchrony’, id: ‘923’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 15 Months’, promoTerm: 15, term: 15, factor: 2.50, rate: 8.80,  apr: 0, postApr: 26.99, legacy: true },
+{ lender: ‘synchrony’, id: ‘925’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 24 Months’, promoTerm: 24, term: 24, factor: 2.50, rate: 12.25, apr: 0, postApr: 26.99, legacy: true },
+// Legacy Synchrony equal-pay
+{ lender: ‘synchrony’, id: ‘931’, family: ‘equal’, desc: ‘0% Interest for 36 Months’, term: 36, factor: 2.78, rate: 17.45, apr: 0, legacy: true },
+{ lender: ‘synchrony’, id: ‘932’, family: ‘equal’, desc: ‘0% Interest for 48 Months’, term: 48, factor: 2.08, rate: 19.20, apr: 0, legacy: true },
+{ lender: ‘synchrony’, id: ‘933’, family: ‘equal’, desc: ‘0% Interest for 60 Months’, term: 60, factor: 1.67, rate: 21.70, apr: 0, legacy: true },
+{ lender: ‘synchrony’, id: ‘934’, family: ‘equal’, desc: ‘0% Interest for 72 Months’, term: 72, factor: 1.39, rate: 25.40, apr: 0, legacy: true },
+// Legacy Synchrony reduced-APR
+{ lender: ‘synchrony’, id: ‘940’, family: ‘reduced’, desc: ‘3.99% APR Until Paid in Full’, factor: 1.25, rate: 23.75, apr: 3.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘941’, family: ‘reduced’, desc: ‘5.99% APR Until Paid in Full’, factor: 1.25, rate: 17.60, apr: 5.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘942’, family: ‘reduced’, desc: ‘7.99% APR Until Paid in Full’, factor: 1.25, rate: 12.75, apr: 7.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘943’, family: ‘reduced’, desc: ‘9.99% APR Until Paid in Full’, factor: 1.25, rate: 9.60,  apr: 9.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘950’, family: ‘reduced’, desc: ‘5.99% APR Until Paid in Full’, factor: 1.50, rate: 16.25, apr: 5.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘951’, family: ‘reduced’, desc: ‘7.99% APR Until Paid in Full’, factor: 1.50, rate: 11.85, apr: 7.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘952’, family: ‘reduced’, desc: ‘9.99% APR Until Paid in Full’, factor: 1.50, rate: 9.25,  apr: 9.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘960’, family: ‘reduced’, desc: ‘3.99% APR Until Paid in Full’, factor: 1.75, rate: 17.25, apr: 3.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘961’, family: ‘reduced’, desc: ‘5.99% APR Until Paid in Full’, factor: 1.75, rate: 14.50, apr: 5.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘962’, family: ‘reduced’, desc: ‘7.99% APR Until Paid in Full’, factor: 1.75, rate: 10.75, apr: 7.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘963’, family: ‘reduced’, desc: ‘9.99% APR Until Paid in Full’, factor: 1.75, rate: 8.85,  apr: 9.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘964’, family: ‘reduced’, desc: ‘10.99% APR Until Paid in Full’, factor: 1.75, rate: 5.75, apr: 10.99, legacy: true },
+{ lender: ‘synchrony’, id: ‘965’, family: ‘reduced’, desc: ‘11.99% APR Until Paid in Full’, factor: 1.75, rate: 4.60, apr: 11.99, legacy: true },
+{ lender: ‘synchrony’, id: ‘970’, family: ‘reduced’, desc: ‘5.99% APR Until Paid in Full’, factor: 2.00, rate: 12.75, apr: 5.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘971’, family: ‘reduced’, desc: ‘7.99% APR Until Paid in Full’, factor: 2.00, rate: 9.60,  apr: 7.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘972’, family: ‘reduced’, desc: ‘9.99% APR Until Paid in Full’, factor: 2.00, rate: 8.65,  apr: 9.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘980’, family: ‘reduced’, desc: ‘5.99% APR Until Paid in Full’, factor: 3.00, rate: 9.60,  apr: 5.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘981’, family: ‘reduced’, desc: ‘7.99% APR Until Paid in Full’, factor: 3.00, rate: 8.85,  apr: 7.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘982’, family: ‘reduced’, desc: ‘9.99% APR Until Paid in Full’, factor: 3.00, rate: 8.00,  apr: 9.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘990’, family: ‘reduced’, desc: ‘5.99% APR Until Paid in Full’, factor: 4.00, rate: 8.85,  apr: 5.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘991’, family: ‘reduced’, desc: ‘7.99% APR Until Paid in Full’, factor: 4.00, rate: 8.60,  apr: 7.99,  legacy: true },
+{ lender: ‘synchrony’, id: ‘992’, family: ‘reduced’, desc: ‘9.99% APR Until Paid in Full’, factor: 4.00, rate: 6.95,  apr: 9.99,  legacy: true },
+// Legacy Wells (8.99% APR equal payment plans, no longer in PDF)
+{ lender: ‘wells’, id: ‘3389’, family: ‘equal-apr’, desc: ‘8.99% APR, 24 equal payments’, term: 24, factor: 4.6538, rate: 4.74, apr: 8.99, legacy: true },
+{ lender: ‘wells’, id: ‘3390’, family: ‘equal-apr’, desc: ‘8.99% APR, 36 equal payments’, term: 36, factor: 3.2170, rate: 5.74, apr: 8.99, legacy: true },
+{ lender: ‘wells’, id: ‘3391’, family: ‘equal-apr’, desc: ‘8.99% APR, 48 equal payments’, term: 48, factor: 2.5090, rate: 6.74, apr: 8.99, legacy: true },
+{ lender: ‘wells’, id: ‘3392’, family: ‘equal-apr’, desc: ‘8.99% APR, 60 equal payments’, term: 60, factor: 2.0888, rate: 7.74, apr: 8.99, legacy: true },
+// Legacy Wells reduced (older variants)
+{ lender: ‘wells’, id: ‘2225’, family: ‘reduced’, desc: ‘12.90% APR, custom payments 2.15%’, factor: 2.15, rate: 5.74, apr: 12.90, legacy: true },
+{ lender: ‘wells’, id: ‘1157’, family: ‘reduced’, desc: ‘6.90% APR, custom payments 2.00%’,  factor: 2.00, rate: 8.74, apr: 6.90,  legacy: true },
+{ lender: ‘wells’, id: ‘2700’, family: ‘reduced’, desc: ‘3.90% APR, custom payments 1.75%’,  factor: 1.75, rate: 13.74, apr: 3.90, legacy: true },
+// Legacy Wells deferred
+{ lender: ‘wells’, id: ‘1148’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 6 Months’,  promoTerm: 6,  term: 6,  factor: 2.50, rate: 4.24, apr: 0, postApr: 26.99, legacy: true },
+{ lender: ‘wells’, id: ‘1181’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 9 Months’,  promoTerm: 9,  term: 9,  factor: 2.50, rate: 5.24, apr: 0, postApr: 26.99, legacy: true },
+{ lender: ‘wells’, id: ‘1047’, family: ‘deferred’, desc: ‘No Interest if Paid in Full within 15 Months’, promoTerm: 15, term: 15, factor: 2.50, rate: 6.74, apr: 0, postApr: 26.99, legacy: true },
+];
+
+const ALL_PLANS = […WELLS, …GREENSKY, …SYNCHRONY, …LEGACY];
+
+const FAMILY_META = {
+deferred:    { label: ‘Deferred Interest’,  short: ‘DEF’,  accent: ‘#B45309’ },
+equal:       { label: ‘0% Equal Pay’,       short: ‘0%’,   accent: ‘#0369A1’ },
+‘equal-apr’: { label: ‘APR Equal Pay’,      short: ‘EQ’,   accent: ‘#6D28D9’ },
+reduced:     { label: ‘Reduced APR’,        short: ‘APR’,  accent: ‘#334155’ },
+installment: { label: ‘Installment Loan’,   short: ‘INST’, accent: ‘#0F766E’ },
+};
+
+const LENDER_META = {
+wells:     { name: ‘Wells Fargo’, color: ‘#B91C1C’, tag: ‘WF’  },
+greensky:  { name: ‘GreenSky’,    color: ‘#15803D’, tag: ‘GS’  },
+synchrony: { name: ‘Synchrony’,   color: ‘#0E5A8A’, tag: ‘SYN’ },
+};
+
+// Glass color tokens — high readability over the gradient backdrop
+const TXT       = ‘#0F172A’;   // primary text — slate-900
+const TXT_MUTED = ‘#475569’;   // secondary — slate-600
+const TXT_FAINT = ‘#64748B’;   // tertiary — slate-500
+const TXT_LABEL = ‘#1E3A5F’;   // overline labels — deep teal-blue
+const GLASS     = ‘rgba(255, 255, 255, 0.55)’;
+const GLASS_HI  = ‘rgba(255, 255, 255, 0.72)’;
+const GLASS_LO  = ‘rgba(255, 255, 255, 0.38)’;
+const BORDER    = ‘rgba(255, 255, 255, 0.55)’;
+const BORDER_DK = ‘rgba(15, 23, 42, 0.10)’;
+
+const fmt  = n => ‘$’ + n.toLocaleString(‘en-US’, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt0 = n => ‘$’ + Math.round(n).toLocaleString(‘en-US’);
+
+function amortize(principal, apr, monthlyPayment) {
+if (apr === 0) {
+const months = Math.ceil(principal / monthlyPayment);
+return { months, totalInterest: 0, totalPaid: principal };
+}
+const r = apr / 100 / 12;
+const denom = 1 - (r * principal) / monthlyPayment;
+if (denom <= 0) return { months: Infinity, totalInterest: Infinity, totalPaid: Infinity };
+const n = -Math.log(denom) / Math.log(1 + r);
+const months = Math.ceil(n);
+const totalPaid = monthlyPayment * n;
+return { months, totalInterest: totalPaid - principal, totalPaid };
+}
+
+function computePlan(plan, amount) {
+let monthlyPayment, term, totalInterest, totalPaid, note;
+
+if (plan.family === ‘deferred’) {
+// Deferred-interest: regular payments at the stated factor over the full term,
+// BUT if balance is paid off within promoTerm, interest is waived.
+// For typical deferred plans (promoTerm === term), this means 0 interest
+// if customer follows the schedule. For hybrids (promoTerm < term), the
+// factor-based payment may not finish by promoTerm — customer would need
+// to pay extra to capture the promo.
+const promoTerm = plan.promoTerm || plan.term;
+const fullTerm  = plan.term || promoTerm;
+
+```
+if (plan.factor != null) {
+  monthlyPayment = (plan.factor / 100) * amount;
+} else {
+  monthlyPayment = amount / fullTerm;
+}
+term = fullTerm;
+
+// Will the factor-based monthly payment finish within the promo window?
+const paidByPromo = monthlyPayment * promoTerm;
+if (paidByPromo >= amount - 0.01) {
+  totalInterest = 0;
+  totalPaid = amount;
+  note = `0% interest if paid in  mo mo)` : ''}`;
+} else {
+  const shortfall = amount - paidByPromo;
+  totalInterest = 0; // assuming customer pays in promo to dodge retro interest
+  totalPaid = amount;
+  note = `Pay off in  mo to avoid % retro interest. Regular pmt only covers  of  — needs /mo extra to clear`;
+}
+```
+
+} else if (plan.family === ‘equal’ && plan.factor) {
+// Equal payments via factor (Synchrony / GreenSky / Wells with factor)
+monthlyPayment = (plan.factor / 100) * amount;
+term = plan.term;
+totalInterest = 0;
+totalPaid = amount;
+note = `True 0% — equal payments over  months`;
+} else if (plan.family === ‘equal’) {
+// True equal-pay 0% (no factor — Wells default plans)
+monthlyPayment = amount / plan.term;
+term = plan.term;
+totalInterest = 0;
+totalPaid = amount;
+note = `True 0% — equal payments over  months`;
+} else if (plan.family === ‘equal-apr’) {
+monthlyPayment = (plan.factor / 100) * amount;
+term = plan.term;
+totalPaid = monthlyPayment * term;
+totalInterest = totalPaid - amount;
+note = `% APR over  fixed months`;
+} else if (plan.family === ‘installment’) {
+// Fixed-term installment loan at stated APR — payment = factor × amount
+monthlyPayment = (plan.factor / 100) * amount;
+term = plan.term;
+totalPaid = monthlyPayment * term;
+totalInterest = totalPaid - amount;
+note = `% APR fixed installment,  mo)` : ''}`;
+} else {
+// Reduced APR — solve for term via amortization
+monthlyPayment = (plan.factor / 100) * amount;
+const a = amortize(amount, plan.apr, monthlyPayment);
+term = a.months;
+totalInterest = a.totalInterest;
+totalPaid = a.totalPaid;
+note = `% APR until paid off`;
+}
+
+const merchantCharge = (plan.rate / 100) * amount;
+const netToBusiness = amount - merchantCharge;
+
+return { monthlyPayment, term, totalInterest, totalPaid, merchantCharge, netToBusiness, note };
+}
+
+export default function FinancingCalculator() {
+const [amount, setAmount] = useState(10000);
+const [targetPayment, setTargetPayment] = useState(0);
+const [targetTerm, setTargetTerm] = useState(0); // 0 = no target; otherwise months
+const [filter, setFilter] = useState(‘all’);
+const [familyFilter, setFamilyFilter] = useState(‘all’);
+const [sort, setSort] = useState(‘payment’);
+const [selected, setSelected] = useState(null);
+const [showLegacy, setShowLegacy] = useState(false);
+const [showMerchantFee, setShowMerchantFee] = useState(true);
+const [showInterest, setShowInterest] = useState(true);
+
+const WF_APPLY_URL = ‘https://retailservices.wellsfargo.com/ahapp/init-app?m=0024322380&l=en_US’;
+
+const results = useMemo(() => {
+let rows = ALL_PLANS.map(p => ({ …p, …computePlan(p, amount) }));
+if (!showLegacy) rows = rows.filter(r => !r.legacy);
+if (filter !== ‘all’) rows = rows.filter(r => r.lender === filter);
+if (familyFilter !== ‘all’) rows = rows.filter(r => r.family === familyFilter);
+
+```
+// Strict timeline filter: only plans that finish in ≤ targetTerm months
+if (targetTerm > 0) {
+  rows = rows.filter(r => r.term !== Infinity && r.term <= targetTerm);
+}
+
+// Dedupe — collapse functional duplicates, keeping the one with the lowest merchant fee.
+// Two plans are "functional duplicates" if EITHER:
+//   (a) same description (covers legacy multi-factor & cross-lender same-product), OR
+//   (b) same monthly payment AND same term at the current dollar amount.
+const dedupe = (input) => {
+  // Map a row to a canonical group leader using a simple union-find
+  const parent = new Map();
+  const find = (k) => {
+    if (!parent.has(k)) parent.set(k, k);
+    if (parent.get(k) === k) return k;
+    const r = find(parent.get(k));
+    parent.set(k, r);
+    return r;
+  };
+  const union = (a, b) => {
+    const ra = find(a), rb = find(b);
+    if (ra !== rb) parent.set(ra, rb);
+  };
+
+  // Index by desc and by (payment, term) so any row in the same bucket gets unioned
+  const byDesc = new Map();
+  const byNum  = new Map();
+  input.forEach((r, i) => {
+    const myKey = `row:`;
+    find(myKey); // ensure exists
+    const dk = `desc:`;
+    const nk = `num:|`;
+    if (byDesc.has(dk)) union(myKey, byDesc.get(dk));
+    else byDesc.set(dk, myKey);
+    if (byNum.has(nk)) union(myKey, byNum.get(nk));
+    else byNum.set(nk, myKey);
+  });
+
+  // Group rows by their root
+  const groups = new Map();
+  input.forEach((r, i) => {
+    const root = find(`row:`);
+    if (!groups.has(root)) groups.set(root, []);
+    groups.get(root).push(r);
+  });
+
+  // For each group, pick lowest-fee winner; record collapsed siblings
+  const out = [];
+  for (const group of groups.values()) {
+    const winner = [...group].sort((a, b) => a.merchantCharge - b.merchantCharge)[0];
+    const others = group.filter(g => g !== winner);
+    out.push({
+      ...winner,
+      _collapsed: others.length > 0 ? others.map(o => ` `) : null,
+    });
+  }
+  return out;
+};
+rows = dedupe(rows);
+
+// Sort
+rows.sort((a, b) => {
+  if (sort === 'plan') return a.id.localeCompare(b.id);
+  if (sort === 'payment') return a.monthlyPayment - b.monthlyPayment;
+  if (sort === 'merchant') return a.merchantCharge - b.merchantCharge;
+  if (sort === 'term') return a.term - b.term;
+  if (sort === 'term-match' && targetTerm > 0) {
+    const da = a.term === Infinity ? 99999 : Math.abs(a.term - targetTerm);
+    const db = b.term === Infinity ? 99999 : Math.abs(b.term - targetTerm);
+    return da - db;
+  }
+  return 0;
+});
+return rows;
+```
+
+}, [amount, filter, familyFilter, sort, targetTerm, targetPayment, showLegacy]);
+
+const recommendations = useMemo(() => {
+const hasPayment = targetPayment > 0;
+const hasTerm = targetTerm > 0;
+if (!hasPayment && !hasTerm) return null;
+
+```
+// results is already strictly filtered by targetTerm (≤ target months).
+// Now apply payment as a hard filter on top.
+const finite = results.filter(r => r.term !== Infinity);
+const affordable = hasPayment
+  ? finite.filter(r => r.monthlyPayment <= targetPayment)
+  : finite;
+
+if (affordable.length === 0) {
+  const minPay = results.length > 0
+    ? results.reduce((m, r) => r.monthlyPayment < m ? r.monthlyPayment : m, Infinity)
+    : Infinity;
+  return {
+    eligible: [],
+    affordable: [],
+    minPossible: minPay,
+    gap: hasPayment && minPay !== Infinity ? minPay - targetPayment : 0,
+    hasPayment, hasTerm,
+  };
+}
+
+const byMerchantFee  = [...affordable].sort((a, b) => a.merchantCharge - b.merchantCharge)[0];
+const byShortest     = [...affordable].sort((a, b) => a.term - b.term)[0];
+const byCustomerCost = [...affordable].sort((a, b) => a.totalPaid - b.totalPaid)[0];
+// With strict timeline, "best match" = closest under (or equal to) target
+const byTermMatch    = hasTerm
+  ? [...affordable].sort((a, b) => (targetTerm - a.term) - (targetTerm - b.term))[0]
+  : null;
+
+return { eligible: affordable, affordable, byMerchantFee, byShortest, byCustomerCost, byTermMatch, hasPayment, hasTerm };
+```
+
+}, [results, targetPayment, targetTerm]);
+
+const glassPanel = {
+background: GLASS,
+backdropFilter: ‘blur(22px) saturate(160%)’,
+WebkitBackdropFilter: ‘blur(22px) saturate(160%)’,
+border: `1px solid `,
+borderRadius: 16,
+boxShadow: ‘0 8px 32px rgba(8, 47, 89, 0.12), inset 0 1px 0 rgba(255,255,255,0.6)’,
+};
+
+return (
+<div style={{
+minHeight: ‘100vh’,
+position: ‘relative’,
+overflow: ‘hidden’,
+// Cool blue → teal gradient base
+background: ‘linear-gradient(135deg, #0EA5E9 0%, #06B6D4 35%, #14B8A6 70%, #2DD4BF 100%)’,
+fontFamily: ‘“Manrope”, ui-sans-serif, -apple-system, system-ui, sans-serif’,
+color: TXT,
+}}>
+{/* Google fonts + animated background orbs + global styles */}
+<style>{`
+@import url(‘https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap’);
+
+```
+    @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float1  { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,-30px) scale(1.08); } }
+    @keyframes float2  { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-50px,40px) scale(1.12); } }
+    @keyframes float3  { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(30px,50px) scale(0.92); } }
+    @keyframes glow    { 0%,100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5); } 50% { box-shadow: 0 0 0 8px rgba(255, 255, 255, 0); } }
+
+    .row { animation: slideIn 0.25s ease-out backwards; }
+    .row:hover { background: rgba(255, 255, 255, 0.45) !important; }
+    .pill { transition: all 0.18s ease; }
+    .pill:hover { transform: translateY(-1px); }
+    .row-eligible  { background: rgba(16, 185, 129, 0.18) !important; }
+    .row-ineligible { opacity: 0.40; }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .num-input { appearance: textfield; -moz-appearance: textfield; }
+
+    input[type="range"] { -webkit-appearance: none; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.45); outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #0EA5E9; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
+    input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 2px solid #0EA5E9; cursor: pointer; }
+
+    select { font-family: inherit; }
+  `}</style>
+
+  {/* Decorative animated background orbs (under glass) */}
+  <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+    <div style={{ position: 'absolute', top: '-10%', left: '-8%', width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%)', animation: 'float1 14s ease-in-out infinite', filter: 'blur(8px)' }} />
+    <div style={{ position: 'absolute', top: '30%', right: '-12%', width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle, rgba(56,189,248,0.55) 0%, rgba(56,189,248,0) 70%)', animation: 'float2 18s ease-in-out infinite', filter: 'blur(6px)' }} />
+    <div style={{ position: 'absolute', bottom: '-12%', left: '20%', width: 520, height: 520, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,211,238,0.45) 0%, rgba(34,211,238,0) 70%)', animation: 'float3 22s ease-in-out infinite', filter: 'blur(10px)' }} />
+    {/* Subtle grain layer for texture */}
+    <div style={{ position: 'absolute', inset: 0, opacity: 0.10, mixBlendMode: 'overlay',
+      backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.7%22/></svg>")' }} />
+  </div>
+
+  {/* Content layer */}
+  <div style={{ position: 'relative', zIndex: 1 }}>
+
+    {/* Header: glass strip with CDW logo */}
+    <div style={{
+      ...glassPanel,
+      borderRadius: 0,
+      borderLeft: 'none',
+      borderRight: 'none',
+      borderTop: 'none',
+      padding: '20px 28px',
+    }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+        <img src={CDW_LOGO} alt="California Deluxe Windows" style={{ height: 52, width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 6px rgba(8, 47, 89, 0.18))' }} />
+        <div style={{ width: 1, height: 44, background: 'linear-gradient(to bottom, transparent, rgba(15,23,42,0.25), transparent)' }} />
+        <div style={{ flex: 1, minWidth: 240 }}>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: TXT }}>
+            Financing Calculator
+          </h1>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: TXT_MUTED, fontWeight: 500 }}>
+            Effective 03/01/2025 · {ALL_PLANS.filter(p => !p.legacy).length} active plans across 3 lenders · Payment, term &amp; merchant fee comparison
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#B91C1C', background: 'rgba(185, 28, 28, 0.14)', padding: '4px 9px', borderRadius: 999, border: '1px solid rgba(185,28,28,0.25)' }}>WELLS FARGO</span>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#15803D', background: 'rgba(21, 128, 61, 0.14)', padding: '4px 9px', borderRadius: 999, border: '1px solid rgba(21,128,61,0.25)' }}>GREENSKY</span>
+          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#0E5A8A', background: 'rgba(14, 90, 138, 0.14)', padding: '4px 9px', borderRadius: 999, border: '1px solid rgba(14,90,138,0.25)' }}>SYNCHRONY</span>
+          <a href={WF_APPLY_URL} target="_blank" rel="noopener noreferrer" className="pill"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+              color: '#fff', textDecoration: 'none',
+              fontSize: 11, fontWeight: 800, letterSpacing: '0.06em',
+              padding: '8px 14px', borderRadius: 999,
+              border: '1px solid rgba(255,255,255,0.4)',
+              boxShadow: '0 4px 12px rgba(185, 28, 28, 0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
+              marginLeft: 6,
+            }}>
+            APPLY · WELLS FARGO
+            <span style={{ fontSize: 10, opacity: 0.85 }}>↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div style={{ maxWidth: 1400, margin: '0 auto', padding: '20px 28px 40px' }}>
+
+      {/* Inputs row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16, marginBottom: 20 }}>
+
+        {/* Amount input */}
+        <div style={{ ...glassPanel, padding: 20 }}>
+          <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: TXT_LABEL, textTransform: 'uppercase', marginBottom: 10 }}>
+            Project Amount
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', background: GLASS_HI, border: '2px solid #0EA5E9', borderRadius: 10, padding: '6px 14px', animation: 'glow 2.4s infinite' }}>
+            <span style={{ fontSize: 24, color: TXT_FAINT, marginRight: 4, fontWeight: 600 }}>$</span>
+            <input
+              type="number"
+              className="num-input"
+              value={amount}
+              onChange={e => setAmount(Math.max(0, parseFloat(e.target.value) || 0))}
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: 28, fontWeight: 800, color: TXT, width: '100%', fontFamily: '"JetBrains Mono", ui-monospace' }}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+            {[5000, 10000, 15000, 25000, 50000].map(p => (
+              <button key={p} className="pill" onClick={() => setAmount(p)}
+                style={{ background: amount === p ? '#0EA5E9' : GLASS_LO, color: amount === p ? '#fff' : TXT, border: amount === p ? '1px solid #0EA5E9' : `1px solid `, padding: '6px 11px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                K
+              </button>
+            ))}
+          </div>
+          <input type="range" min="500" max="100000" step="500" value={amount} onChange={e => setAmount(parseFloat(e.target.value))}
+            style={{ width: '100%', marginTop: 14 }} />
+        </div>
+
+        {/* Target payment input */}
+        <div style={{ ...glassPanel, padding: 20 }}>
+          <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: TXT_LABEL, textTransform: 'uppercase', marginBottom: 10 }}>
+            Customer's Max Monthly Payment <span style={{ color: TXT_FAINT, fontWeight: 600 }}>(optional)</span>
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', background: GLASS_HI, border: `2px solid  'rgba(15,23,42,0.18)'`, borderRadius: 10, padding: '6px 14px' }}>
+            <span style={{ fontSize: 24, color: TXT_FAINT, marginRight: 4, fontWeight: 600 }}>$</span>
+            <input
+              type="number"
+              className="num-input"
+              placeholder="0"
+              value={targetPayment || ''}
+              onChange={e => setTargetPayment(Math.max(0, parseFloat(e.target.value) || 0))}
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: 28, fontWeight: 800, color: TXT, width: '100%', fontFamily: '"JetBrains Mono", ui-monospace' }}
+            />
+            <span style={{ fontSize: 12, color: TXT_FAINT, marginLeft: 4, fontWeight: 600 }}>/mo</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+            {[150, 200, 300, 500, 0].map(p => (
+              <button key={p} className="pill" onClick={() => setTargetPayment(p)}
+                style={{ background: targetPayment === p ? '#10B981' : GLASS_LO, color: targetPayment === p ? '#fff' : TXT, border: targetPayment === p ? '1px solid #10B981' : `1px solid `, padding: '6px 11px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                {p === 0 ? 'Clear' : `$`}
+              </button>
+            ))}
+          </div>
+          {targetPayment > 0 && (
+            <div style={{ marginTop: 10, fontSize: 11, color: '#047857', fontWeight: 600 }}>
+              ● Filtering for plans ≤ {fmt0(targetPayment)}/mo
+            </div>
+          )}
+        </div>
+
+        {/* Target payoff timeline input */}
+        <div style={{ ...glassPanel, padding: 20 }}>
+          <label style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: TXT_LABEL, textTransform: 'uppercase', marginBottom: 10 }}>
+            Customer's Target Payoff Timeline <span style={{ color: TXT_FAINT, fontWeight: 600 }}>(optional)</span>
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', background: GLASS_HI, border: `2px solid  'rgba(15,23,42,0.18)'`, borderRadius: 10, padding: '6px 14px' }}>
+            <input
+              type="number"
+              className="num-input"
+              placeholder="0"
+              value={targetTerm || ''}
+              onChange={e => setTargetTerm(Math.max(0, Math.floor(parseFloat(e.target.value) || 0)))}
+              style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: 28, fontWeight: 800, color: TXT, width: '100%', fontFamily: '"JetBrains Mono", ui-monospace' }}
+            />
+            <span style={{ fontSize: 13, color: TXT_FAINT, marginLeft: 4, fontWeight: 700, whiteSpace: 'nowrap' }}>
+              months {targetTerm >= 12 && <span style={{ color: '#0D9488', fontWeight: 600 }}>· {(targetTerm / 12).toFixed(targetTerm % 12 === 0 ? 0 : 1)} yr</span>}
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+            {[
+              { v: 12,  l: '1 yr'  },
+              { v: 24,  l: '2 yr'  },
+              { v: 36,  l: '3 yr'  },
+              { v: 60,  l: '5 yr'  },
+              { v: 120, l: '10 yr' },
+              { v: 0,   l: 'Clear' },
+            ].map(p => (
+              <button key={p.v} className="pill" onClick={() => setTargetTerm(p.v)}
+                style={{ background: targetTerm === p.v ? '#0D9488' : GLASS_LO, color: targetTerm === p.v ? '#fff' : TXT, border: targetTerm === p.v ? '1px solid #0D9488' : `1px solid `, padding: '6px 11px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                {p.l}
+              </button>
+            ))}
+          </div>
+          {targetTerm > 0 && (
+            <div style={{ marginTop: 10, fontSize: 11, color: '#0F766E', fontWeight: 600 }}>
+              ● Showing only plans that finish in ≤ {targetTerm} mo
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recommendations */}
+      {recommendations && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.30) 0%, rgba(16, 185, 129, 0.18) 100%)',
+          backdropFilter: 'blur(22px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(22px) saturate(160%)',
+          border: '1px solid rgba(16, 185, 129, 0.55)',
+          borderRadius: 16,
+          padding: 20,
+          marginBottom: 20,
+          animation: 'slideIn 0.3s ease-out',
+          boxShadow: '0 8px 32px rgba(6, 95, 70, 0.18), inset 0 1px 0 rgba(255,255,255,0.5)',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.12em', color: '#065F46', textTransform: 'uppercase', marginBottom: 12 }}>
+            ★ Recommendations for {fmt0(amount)}
+            {recommendations.hasPayment && <> at ≤ {fmt0(targetPayment)}/mo</>}
+            {recommendations.hasTerm && <> · target {targetTerm} mo</>}
+          </div>
+          {recommendations.affordable.length === 0 ? (
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: TXT }}>
+                No plans fit this budget at {fmt0(amount)}.
+              </div>
+              <div style={{ fontSize: 13, color: '#065F46', marginTop: 6, fontWeight: 500 }}>
+                Lowest possible monthly is {fmt(recommendations.minPossible)} —
+                customer is {fmt(recommendations.gap)} short. Consider down payment, longer term not available, or smaller scope.
+              </div>
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: 13, color: '#065F46', marginBottom: 12, fontWeight: 500 }}>
+                {recommendations.affordable.length} plan{recommendations.affordable.length === 1 ? '' : 's'} {recommendations.hasPayment ? 'fit the budget' : 'available'}
+                {recommendations.hasTerm && <>, all paying off in ≤ {targetTerm} mo</>}.
+                Top picks by goal:
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+                {[
+                  recommendations.byTermMatch && {
+                    goal: `Best Match for -mo Target`,
+                    plan: recommendations.byTermMatch,
+                    color: '#0D9488',
+                    extra: recommendations.byTermMatch.term === targetTerm
+                      ? `Exactly  mo`
+                      : ` mo ( mo under target)`,
+                  },
+                  showMerchantFee && { goal: 'Best Margin (lowest fee)',  plan: recommendations.byMerchantFee,  color: '#0EA5E9' },
+                  { goal: 'Fastest Payoff',                    plan: recommendations.byShortest,     color: '#D97706' },
+                  { goal: 'Best for Customer (lowest total)',  plan: recommendations.byCustomerCost, color: '#7C3AED' },
+                ].filter(Boolean).map((rec, i) => {
+                  const lm = LENDER_META[rec.plan.lender];
+                  return (
+                    <div key={i} onClick={() => setSelected(rec.plan.lender + '-' + rec.plan.id)}
+                      style={{ background: GLASS_HI, borderLeft: `4px solid `, border: `1px solid `, borderRadius: 10, padding: 12, cursor: 'pointer' }}>
+                      <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: rec.color, textTransform: 'uppercase' }}>
+                        {rec.goal}
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: TXT, marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 9, color: '#fff', background: lm.color, padding: '2px 6px', borderRadius: 3, fontWeight: 800 }}>{lm.tag}</span>
+                        Plan {rec.plan.id}
+                      </div>
+                      <div style={{ fontSize: 11, color: TXT_MUTED, marginTop: 2 }}>
+                        {rec.plan.desc}
+                      </div>
+                      <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 11, fontFamily: '"JetBrains Mono", ui-monospace', fontWeight: 600, flexWrap: 'wrap' }}>
+                        <span style={{ color: '#047857' }}>{fmt(rec.plan.monthlyPayment)}/mo</span>
+                        <span style={{ color: TXT_MUTED }}>{rec.plan.term} mo</span>
+                        {showMerchantFee && <span style={{ color: '#B91C1C' }}>fee {fmt0(rec.plan.merchantCharge)}</span>}
+                      </div>
+                      {rec.extra && (
+                        <div style={{ marginTop: 6, fontSize: 10, color: rec.color, fontWeight: 700, letterSpacing: '0.04em' }}>
+                          {rec.extra}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Filters */}
+      <div style={{ ...glassPanel, padding: '12px 14px', marginBottom: 12, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {[{ k: 'all', l: 'All Lenders' }, { k: 'wells', l: 'Wells Fargo' }, { k: 'greensky', l: 'GreenSky' }, { k: 'synchrony', l: 'Synchrony' }].map(f => (
+            <button key={f.k} onClick={() => setFilter(f.k)} className="pill"
+              style={{ background: filter === f.k ? TXT : 'transparent', color: filter === f.k ? '#fff' : TXT, border: filter === f.k ? `1px solid ` : `1px solid `, padding: '6px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              {f.l}
+            </button>
+          ))}
+        </div>
+        <div style={{ width: 1, height: 22, background: 'rgba(15,23,42,0.18)' }} />
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {[{ k: 'all', l: 'All Types' }, { k: 'deferred', l: 'Deferred' }, { k: 'equal', l: '0% Equal' }, { k: 'equal-apr', l: 'APR Equal' }, { k: 'installment', l: 'Installment' }, { k: 'reduced', l: 'Reduced APR' }].map(f => (
+            <button key={f.k} onClick={() => setFamilyFilter(f.k)} className="pill"
+              style={{ background: familyFilter === f.k ? GLASS_HI : 'transparent', color: familyFilter === f.k ? TXT : TXT_MUTED, border: `1px solid `, padding: '6px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+              {f.l}
+            </button>
+          ))}
+        </div>
+        <div style={{ width: 1, height: 22, background: 'rgba(15,23,42,0.18)' }} />
+        <button onClick={() => setShowLegacy(!showLegacy)} className="pill"
+          style={{ background: showLegacy ? '#7C3AED' : 'transparent', color: showLegacy ? '#fff' : TXT_MUTED, border: showLegacy ? '1px solid #7C3AED' : `1px solid `, padding: '6px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em' }}>
+          {showLegacy ? '✓ Legacy Plans' : '+ Show Legacy'}
+        </button>
+        <button onClick={() => setShowMerchantFee(!showMerchantFee)} className="pill"
+          style={{ background: !showMerchantFee ? '#B91C1C' : 'transparent', color: !showMerchantFee ? '#fff' : TXT_MUTED, border: !showMerchantFee ? '1px solid #B91C1C' : `1px solid `, padding: '6px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em' }}
+          title={showMerchantFee ? 'Hide merchant fee column (e.g. for customer view)' : 'Show merchant fee column'}>
+          {showMerchantFee ? '⊘ Hide Fee' : '✓ Fee Hidden'}
+        </button>
+        <button onClick={() => setShowInterest(!showInterest)} className="pill"
+          style={{ background: !showInterest ? '#B45309' : 'transparent', color: !showInterest ? '#fff' : TXT_MUTED, border: !showInterest ? '1px solid #B45309' : `1px solid `, padding: '6px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.04em' }}
+          title={showInterest ? 'Hide total interest column' : 'Show total interest column'}>
+          {showInterest ? '⊘ Hide Interest' : '✓ Interest Hidden'}
+        </button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: 10, color: TXT_LABEL, letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 800 }}>Sort</span>
+          <select value={sort} onChange={e => setSort(e.target.value)}
+            style={{ background: GLASS_HI, color: TXT, border: `1px solid `, padding: '6px 10px', borderRadius: 8, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+            <option value="payment">Monthly Payment</option>
+            {showMerchantFee && <option value="merchant">Merchant Fee</option>}
+            <option value="term">Term Length</option>
+            {targetTerm > 0 && <option value="term-match">Closest to {targetTerm}-mo Target</option>}
+            <option value="plan">Plan #</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Results count */}
+      <div style={{ fontSize: 11, color: TXT_LABEL, marginBottom: 8, fontWeight: 600, letterSpacing: '0.04em' }}>
+        Showing {results.length} plans
+        {targetPayment > 0 && recommendations && ` ·  fit budget`}
+        {targetTerm > 0 && ` · payoff ≤  mo`}
+      </div>
+
+      {/* Table */}
+      <div style={{ ...glassPanel, overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: showMerchantFee && showInterest ? 1000 : 800 }}>
+            <thead>
+              <tr style={{ background: 'rgba(15, 23, 42, 0.06)' }}>
+                {[
+                  { l: 'Lender',         show: true },
+                  { l: 'Plan',           show: true },
+                  { l: 'Type',           show: true },
+                  { l: 'Description',    show: true },
+                  { l: 'Monthly',        show: true },
+                  { l: 'Term',           show: true },
+                  { l: 'Total Interest', show: showInterest },
+                  { l: 'Merchant Fee',   show: showMerchantFee },
+                  { l: 'You Receive',    show: showMerchantFee },
+                ].filter(h => h.show).map((h, i, arr) => (
+                  <th key={h.l} style={{ padding: '12px 12px', textAlign: i >= arr.findIndex(x => x.l === 'Monthly') ? 'right' : 'left', fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: TXT_LABEL, textTransform: 'uppercase', borderBottom: `1px solid ` }}>
+                    {h.l}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((r, idx) => {
+                const meta = FAMILY_META[r.family];
+                const lm = LENDER_META[r.lender];
+                const rowKey = r.lender + '-' + r.id;
+                const isSelected = selected === rowKey;
+                const isEligible = targetPayment > 0 && r.monthlyPayment <= targetPayment;
+                const isIneligible = targetPayment > 0 && r.monthlyPayment > targetPayment;
+                return (
+                  <tr key={rowKey} className={`row  ''  ''`}
+                    onClick={() => setSelected(isSelected ? null : rowKey)}
+                    style={{ borderBottom: `1px solid `, background: isSelected ? 'rgba(255,255,255,0.55)' : 'transparent', cursor: 'pointer', animationDelay: `s` }}>
+                    <td style={{ padding: '11px 12px' }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.06em', color: '#fff', background: lm.color, padding: '3px 7px', borderRadius: 999 }}>
+                        {lm.tag}
+                      </span>
+                    </td>
+                    <td style={{ padding: '11px 12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+                        <span style={{ fontFamily: '"JetBrains Mono", ui-monospace', fontSize: 13, fontWeight: 700, color: TXT }}>{r.id}</span>
+                        {r.badge && <span style={{ fontSize: 8, fontWeight: 800, color: '#92400E', background: 'rgba(251, 191, 36, 0.35)', padding: '2px 5px', borderRadius: 3, letterSpacing: '0.04em' }}>{r.badge}</span>}
+                        {r.revolving && <span style={{ fontSize: 8, fontWeight: 800, color: '#0E5A8A', background: 'rgba(14, 90, 138, 0.18)', padding: '2px 5px', borderRadius: 3, letterSpacing: '0.04em' }}>REVOLVING</span>}
+                        {r.legacy && <span style={{ fontSize: 8, fontWeight: 800, color: '#7C3AED', background: 'rgba(124, 58, 237, 0.18)', padding: '2px 5px', borderRadius: 3, letterSpacing: '0.04em' }}>LEGACY</span>}
+                        {r._collapsed && (
+                          <span title={`Equivalent plans collapsed: `}
+                            style={{ fontSize: 8, fontWeight: 800, color: '#0F766E', background: 'rgba(13, 148, 136, 0.18)', padding: '2px 5px', borderRadius: 3, letterSpacing: '0.04em' }}>
+                            +{r._collapsed.length}
+                          </span>
+                        )}
+                        {isEligible && <span style={{ fontSize: 11, color: '#047857', fontWeight: 800 }}>✓</span>}
+                      </div>
+                    </td>
+                    <td style={{ padding: '11px 12px' }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: meta.accent, background: `1F`, padding: '3px 7px', borderRadius: 4, letterSpacing: '0.04em' }}>{meta.short}</span>
+                    </td>
+                    <td style={{ padding: '11px 12px', fontSize: 12, color: TXT_MUTED, fontWeight: 500 }}>{r.desc}</td>
+                    <td style={{ padding: '11px 12px', textAlign: 'right' }}>
+                      <span style={{ fontFamily: '"JetBrains Mono", ui-monospace', fontSize: 13, fontWeight: 800, color: isEligible ? '#047857' : (isIneligible ? TXT_FAINT : TXT) }}>
+                        {fmt(r.monthlyPayment)}
+                      </span>
+                    </td>
+                    <td style={{ padding: '11px 12px', textAlign: 'right', fontSize: 12, fontFamily: '"JetBrains Mono", ui-monospace', fontWeight: 600,
+                      color: targetTerm > 0 && r.term !== Infinity ? '#0D9488' : TXT_MUTED }}>
+                      {r.term === Infinity ? '—' : `mo`}
+                      {targetTerm > 0 && r.term !== Infinity && (targetTerm - r.term) <= 3 && (
+                        <span style={{ marginLeft: 4, fontSize: 10, color: '#0D9488', fontWeight: 800 }}>★</span>
+                      )}
+                    </td>
+                    {showInterest && (
+                      <td style={{ padding: '11px 12px', textAlign: 'right', fontSize: 12, color: r.totalInterest > 0 ? '#B45309' : TXT_FAINT, fontFamily: '"JetBrains Mono", ui-monospace', fontWeight: 600 }}>
+                        {r.totalInterest === 0 ? '' : fmt0(r.totalInterest)}
+                      </td>
+                    )}
+                    {showMerchantFee && (
+                      <td style={{ padding: '11px 12px', textAlign: 'right', fontSize: 12, color: '#B91C1C', fontFamily: '"JetBrains Mono", ui-monospace', fontWeight: 600 }}>
+                        {fmt(r.merchantCharge)}
+                      </td>
+                    )}
+                    {showMerchantFee && (
+                      <td style={{ padding: '11px 12px', textAlign: 'right' }}>
+                        <span style={{ fontFamily: '"JetBrains Mono", ui-monospace', fontSize: 13, fontWeight: 800, color: '#0E5A8A' }}>
+                          {fmt0(r.netToBusiness)}
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Selected detail */}
+      {selected && (() => {
+        const r = results.find(x => (x.lender + '-' + x.id) === selected);
+        if (!r) return null;
+        const meta = FAMILY_META[r.family];
+        const lm = LENDER_META[r.lender];
+        return (
+          <div style={{
+            marginTop: 16,
+            ...glassPanel,
+            background: GLASS_HI,
+            border: `1px solid 66`,
+            padding: 20,
+            animation: 'slideIn 0.3s ease-out',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', color: '#fff', background: lm.color, padding: '3px 9px', borderRadius: 999 }}>{lm.name}</span>
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', color: meta.accent, textTransform: 'uppercase' }}>{meta.label}</span>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: TXT, letterSpacing: '-0.01em' }}>Plan {r.id} — {r.desc}</div>
+                <div style={{ fontSize: 12, color: TXT_MUTED, marginTop: 4, fontStyle: 'italic' }}>{r.note}</div>
+                {r._collapsed && (
+                  <div style={{ marginTop: 6, fontSize: 11, color: '#0F766E', fontWeight: 600, background: 'rgba(13, 148, 136, 0.10)', padding: '4px 8px', borderRadius: 6, display: 'inline-block' }}>
+                    Equivalent plans (lower fee chosen): {r._collapsed.join(' · ')}
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setSelected(null)} style={{ background: GLASS_LO, border: `1px solid `, color: TXT_MUTED, borderRadius: 8, padding: '4px 10px', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>✕</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginTop: 14 }}>
+              {[
+                { l: 'Project Amount',      v: fmt0(amount),                                     c: TXT,        show: true },
+                { l: 'Monthly Payment',     v: fmt(r.monthlyPayment),                            c: '#047857',  show: true },
+                { l: 'Term',                v: r.term === Infinity ? '—' : ` mo`,       c: TXT,        show: true },
+                { l: 'Customer Total Pays', v: fmt0(r.totalPaid),                                c: TXT,        show: true },
+                { l: 'Total Interest',      v: fmt0(r.totalInterest),                            c: r.totalInterest > 0 ? '#B45309' : TXT_FAINT, show: showInterest },
+                { l: 'Merchant Fee',        v: fmt(r.merchantCharge),                            c: '#B91C1C',  show: showMerchantFee },
+                { l: 'Net to Business',     v: fmt0(r.netToBusiness),                            c: '#0E5A8A',  show: showMerchantFee },
+              ].filter(s => s.show).map((s, i) => (
+                <div key={i} style={{ background: GLASS_LO, borderRadius: 10, padding: 12, border: `1px solid ` }}>
+                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: TXT_LABEL, textTransform: 'uppercase' }}>{s.l}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: s.c, marginTop: 4, fontFamily: '"JetBrains Mono", ui-monospace' }}>{s.v}</div>
+                </div>
+              ))}
+            </div>
+            {r.lender === 'wells' && (
+              <div style={{ marginTop: 16, padding: 14, borderRadius: 10, background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.12) 0%, rgba(185, 28, 28, 0.08) 100%)', border: '1px solid rgba(185, 28, 28, 0.30)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: '#B91C1C', textTransform: 'uppercase' }}>Ready to apply?</div>
+                  <div style={{ fontSize: 13, color: TXT, fontWeight: 600, marginTop: 2 }}>
+                    Send the customer to the Wells Fargo Home Projects credit application.
+                  </div>
+                </div>
+                <a href={WF_APPLY_URL} target="_blank" rel="noopener noreferrer" className="pill"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+                    color: '#fff', textDecoration: 'none',
+                    fontSize: 12, fontWeight: 800, letterSpacing: '0.06em',
+                    padding: '10px 18px', borderRadius: 999,
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    boxShadow: '0 4px 14px rgba(185, 28, 28, 0.4), inset 0 1px 0 rgba(255,255,255,0.25)',
+                    whiteSpace: 'nowrap',
+                  }}>
+                  APPLY NOW
+                  <span style={{ fontSize: 12, opacity: 0.85 }}>↗</span>
+                </a>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
+      <div style={{ marginTop: 22, fontSize: 10, color: TXT_LABEL, textAlign: 'center', lineHeight: 1.7, fontWeight: 500, opacity: 0.85 }}>
+        Plan data sourced from CDW Loan Programs sheet, effective 03/01/2025. Reduced-APR terms estimated by amortization at stated APR.
+        Equal-payment plans use principal ÷ term or stated factor. Deferred Interest plans accrue retroactive interest at the noted post-promo APR if not paid in full by promo end.
+        Synchrony customers pay a one-time .00 Activation Fee (not included). Wells Fargo also charges a /mo Program Maintenance Fee (not factored above).
+        Installment loans (AC84/AC120/AC144) have minimum amount requirements as noted in the description.
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+);
+}
